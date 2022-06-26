@@ -23,3 +23,5 @@ flask_app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(flask_app)
 migrate = Migrate(flask_app, db)
+
+from app import routes
