@@ -4,9 +4,12 @@ from .utils import configuration
 # Flask object
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager
 
 flask_app = Flask(__name__)
 flask_app.config['SECRET_KEY'] = configuration.SECRET_KEY
+
+login_manager = LoginManager(flask_app)
 
 # Database connection
 db_info = {
