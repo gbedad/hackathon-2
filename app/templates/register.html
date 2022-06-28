@@ -1,5 +1,7 @@
 {% extends 'layout.html' %}
-
+{% block title %}
+Register
+{% endblock %}
 {% block content %}
         <h1>Register</h1>
     <form action="" method="post">
@@ -12,13 +14,20 @@
             {% endfor %}
         </p>
         <p>
+            {{ form.email.label }}<br>
+            {{ form.email(size=32) }}<br>
+            {% for error in form.email.errors %}
+            <span class="danger">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
             {{ form.password.label }}<br>
             {{ form.password(size=32) }}<br>
             {% for error in form.password.errors %}
             <span class="danger">[{{ error }}]</span>
             {% endfor %}
         </p>
-        <p>
+                <p>
             {{ form.password2.label }}<br>
             {{ form.password2(size=32) }}<br>
             {% for error in form.password2.errors %}
@@ -32,6 +41,7 @@
                 <span class="danger">[{{ error }}]</span>
                 {% endfor %}
         </p>
+        {% if form.role == 'admin' %}
         <p>
                 {{ form.role.label }}<br>
                 {{ form.role(size=32) }}<br>
@@ -39,6 +49,7 @@
                 <span class="danger">[{{ error }}]</span>
                 {% endfor %}
         </p>
+        {% endif %}
         <p>
                 {{ form.teamId.label }}<br>
                 {{ form.teamId() }}<br>

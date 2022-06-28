@@ -5,11 +5,15 @@ from .utils import configuration
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+from flask_bcrypt import Bcrypt
 
 flask_app = Flask(__name__)
 flask_app.config['SECRET_KEY'] = configuration.SECRET_KEY
 
 login_manager = LoginManager(flask_app)
+bcrypt = Bcrypt(flask_app)
+login_manager.login_view = 'login'
+login_manager.login_message_category = 'info'
 
 # Database connection
 db_info = {

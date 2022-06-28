@@ -14,10 +14,11 @@ class LoginForm(FlaskForm):
 
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
-    password2 = PasswordField('Password', validators=[DataRequired(), EqualTo('password')])
+    password2 = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
     fullname = StringField('Full Name', validators=[DataRequired()])
-    role = StringField('Role', validators=[DataRequired()], default='user')
+    role = StringField('Role', validators=[DataRequired()], default='teacher')
     teamId = IntegerField('Team number', validators=[DataRequired()])
     teamName = StringField('Team name', validators=[DataRequired()])
     submit = SubmitField('Register')
@@ -27,8 +28,13 @@ class RegistrationForm(FlaskForm):
         if user is not None:  # username exist
             raise ValidationError('Please use a different username.')
 
+    def validate_email(self, email):
+        user = User.query.filter_by(email=self.email.data).first()
+        if user is not None:  # username exist
+            raise ValidationError('Please use a different email.')
+
     def validate_teamId(self, teamId):
-        team = Team.query.filter_by(id=teamId.data).first()
+        team = Team.query.filter_by(id=self.teamId.data).first()
         if team is not None:
             if team.teamName != self.teamName.data:
                 raise ValidationError('Team name does not match, try again.')
