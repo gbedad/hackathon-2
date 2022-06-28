@@ -38,3 +38,17 @@ class RegistrationForm(FlaskForm):
         if team is not None:
             if team.teamName != self.teamName.data:
                 raise ValidationError('Team name does not match, try again.')
+
+
+class CreateRoomForm(FlaskForm):
+    id = IntegerField('Id', validators=[DataRequired()])
+    roomName = StringField('Room Name', validators=[DataRequired()])
+    person_num = IntegerField('Number of Person', validators=[DataRequired()])
+    remote = BooleanField('Remote', false_values=(False, 'false', 0, '0'))
+
+    submit = SubmitField('Register')
+
+    def validate_room(self, roomId):
+        room = Room.query.filter_by(id=self.roomId.data).first()
+        if room is not None:  # username exist
+            raise ValidationError('Please use a different room id.')

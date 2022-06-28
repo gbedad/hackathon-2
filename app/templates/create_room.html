@@ -1,0 +1,41 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Login
+{% endblock %}
+{% block content %}
+    <h1>Create Room Form</h1>
+    <form action="" method="post">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.id.label }}<br>
+            {{ form.id }}<br>
+            {% for error in form.id.errors %}
+            <span class="danger">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.roomName.label }}<br>
+            {{ form.roomName(size=32) }}<br>
+            {% for error in form.roomName.errors %}
+            <span class="danger">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.person_num.label }}<br>
+            {{ form.person_num }}<br>
+            {% for error in form.person_num.errors %}
+            <span class="danger">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+                <p>
+            {{ form.remote.label }}<br>
+            {{ form.remote }}<br>
+            {% for error in form.remote.errors %}
+            <span class="danger">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+
+        <p>{{ form.submit() }}</p>
+    </form>
+{% endblock %}

@@ -10,6 +10,9 @@ Account
 <h3>Login to start booking process!</h3>
 {% else %}
 
-<h1>Hi, {{ current_user.username }}!</h1>
+<h2>Hi, {{ current_user.username }}!</h2>
+<p>Email: {{ current_user.email }}</p>
+<p>Role: {{ current_user.role }}</p>
+<p>Team: {{ current_user.teamId }}</p>
 {% endif %}
 {% endblock %}

@@ -65,3 +65,25 @@ def logout():
 @login_required
 def account():
     return render_template('account.html', title='Account')
+
+
+@flask_app.route('/create/room', methods=['GET', 'POST'])
+def create_room():
+    form = CreateRoomForm()
+    if form.validate_on_submit():
+        room = Room.query.filter_by(id=form.id.data).first()
+        if not room:
+            new_room = Room(id=form.id.data, roomName=form.roomName.data, person_num=form.person_num.data, remote=form.remote.data)
+            db.session.add(new_room)
+            db.session.commit()
+            flash('Room created', 'success')
+            return redirect(url_for('show_rooms'))
+        else:
+            flash('Room already existing', 'danger')
+    return render_template('create_room.html', title='Create Room', form=form)
+
+
+@flask_app.route('/show_rooms', methods=['GET'])
+def show_rooms():
+    rooms = Room.query.all()
+    return render_template('show_rooms.html', rooms=rooms)
