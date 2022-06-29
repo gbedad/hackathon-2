@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h1>All meetings:</h1>
+<table border="1" cellpadding=3>
+    <tr>
+        <th>Meeting</th>
+        <th>Team</th>
+        <th>Room</th>
+        <th>Booker</th>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Duration</th>
+    </tr>
+{% for meeting in meetings %}
+    <tr>
+        <td>{{ meeting.title }}</td>
+        <td>{{ meeting.team.teamName}}</td>
+        <td>{{ meeting.room.roomName}}</td>
+        <td>{{ meeting.who_booked}}</td>
+        <td>{{ meeting.date.strftime('%Y-%m-%d')}}</td>
+        <td>{{ meeting.startTime}}</td>
+        <td>{{ meeting.duration}}</td>
+    </tr>
+{% endfor %}
+</table>
+{% endblock %}

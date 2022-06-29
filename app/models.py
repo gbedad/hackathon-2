@@ -21,8 +21,8 @@ class User(db.Model, UserMixin):
 class Team(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)
     teamName = db.Column(db.String(64), nullable=False, unique=True)
-    members = db.relationship('User',backref='team', lazy='dynamic')
-    #meetings=db.relationship('Meeting',backref='team',lazy='dynamic')
+    members = db.relationship('User', backref='team', lazy='dynamic')
+    meetings = db.relationship('Meeting', backref='team', lazy='dynamic')
 
     def __repr__(self):
         return f'<Team {self.teamName}>'
@@ -42,14 +42,13 @@ class Room(db.Model):
 class Meeting(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)
     title = db.Column(db.String(64), nullable=False, unique=True)
-    #teamId = db.Column(db.Integer, db.ForeignKey('team.id'))
+    teamId = db.Column(db.Integer, db.ForeignKey('team.id'))
     roomId = db.Column(db.Integer, db.ForeignKey('room.id'), nullable=False)
-    #bookerId = db.Column(db.Integer, db.ForeignKey('user.id'))
-    date = db.Column(db.DateTime, nullable=False)
+    bookerId = db.Column(db.Integer, db.ForeignKey('user.id'))
+    date = db.Column(db.Date, nullable=False)
     startTime = db.Column(db.Integer, nullable=False)
-    endTime = db.Column(db.Integer, nullable=False) # should be calculated with startTime and duration
+    endTime = db.Column(db.Integer, nullable=False)
     duration = db.Column(db.Integer, nullable=False)
-    #cost=db.Column(db.Integer,nullable=False)
     #participant_users=db.relationship('Participants_user',backref='meeting')
     #participant_partners=db.relationship('Participants_partner',backref='meeting')
 

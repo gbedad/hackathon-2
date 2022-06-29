@@ -68,6 +68,7 @@ def account():
 
 
 @flask_app.route('/create/room', methods=['GET', 'POST'])
+@login_required
 def create_room():
     form = CreateRoomForm()
     if form.validate_on_submit():
@@ -84,6 +85,48 @@ def create_room():
 
 
 @flask_app.route('/show_rooms', methods=['GET'])
+@login_required
 def show_rooms():
     rooms = Room.query.all()
     return render_template('show_rooms.html', rooms=rooms)
+
+
+@flask_app.route('/book', methods=['GET', 'POST'])
+@login_required
+def book_meeting():
+    form = BookmeetingForm()
+    if form.validate_on_submit():
+
+
+
+        # make booking
+        booker = current_user
+
+        team = Team.query.filter_by(id=current_user.teamId).first()
+        room = Room.query.filter_by(id=form.rooms.data).first()
+        endTime = form.startTime.data + form.duration.data
+
+        participants_user = form.participants_user.data
+        if len(participants_user) > room.person_num:
+            flash('Max number of person reached!', 'danger')
+            return redirect(url_for('book_meeting'))
+
+        meeting = Meeting(title=form.title.data, teamId=team.id, roomId=room.id, bookerId=booker.id,
+                          date=form.date.data, startTime=form.startTime.data, endTime=endTime,
+                          duration=form.duration.data)
+        db.session.add(meeting)
+
+        db.session.commit()
+        flash('Booking success!', 'success')
+        return redirect(url_for('all_meetings'))
+    return render_template('book_room.html', title='Book Meeting', form=form)
+
+
+@flask_app.route('/all_meetings', methods=['GET', 'POST'])
+@login_required
+def all_meetings():
+    if current_user.role == 'admin':
+        meetings = Meeting.query.all()
+    else:
+        meetings = Meeting.query.filter_by(bookerId=current_user.id)
+    return render_template('all_meetings.html', meetings=meetings)
