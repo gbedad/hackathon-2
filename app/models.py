@@ -15,7 +15,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(64), nullable=False)
     role = db.Column(db.String(64), nullable=False)
     teamId = db.Column(db.Integer, db.ForeignKey('team.id'), nullable=False)
-    #meetings = db.relationship('Meeting', backref='who_booked', lazy='dynamic')
+    #meetings = db.relationship('Meeting', backref='booker', lazy='dynamic')
 
 
 class Team(db.Model):
@@ -41,7 +41,7 @@ class Room(db.Model):
 
 class Meeting(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)
-    title = db.Column(db.String(64), nullable=False, unique=True)
+    title = db.Column(db.String(64), nullable=False)
     teamId = db.Column(db.Integer, db.ForeignKey('team.id'))
     roomId = db.Column(db.Integer, db.ForeignKey('room.id'), nullable=False)
     bookerId = db.Column(db.Integer, db.ForeignKey('user.id'))

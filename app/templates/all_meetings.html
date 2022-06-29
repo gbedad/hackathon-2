@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<h1>All meetings:</h1>
+<legend class="border-bottom mb-4 text-warning">{{legend }}</legend>
 <table border="1" cellpadding=3>
     <tr>
         <th>Meeting</th>
@@ -11,11 +11,11 @@
         <th>Date</th>
         <th>Time</th>
         <th>Duration</th>
-        <th>Confirmed</th>
+        <th>Is Confirmed</th>
     </tr>
 {% for meeting in meetings %}
     <tr>
-        <td><a class="text-info text-decoration-none" href="">{{ meeting.title }}</a></td>
+        <td><a class="text-info text-decoration-none" href="{{ url_for('meeting_update', meeting_id=meeting.id) }}">{{ meeting.title }}</a></td>
         <td>{{ meeting.team.teamName}}</td>
         <td>{{ meeting.room.roomName}}</td>
         <td>{{ meeting.who_booked}}</td>

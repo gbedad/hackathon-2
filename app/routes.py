@@ -1,6 +1,6 @@
 from app import flask_app
 
-from flask import redirect, render_template, url_for, flash, request
+from flask import redirect, render_template, url_for, flash, request, abort
 from app.forms import *
 from app.models import *
 from app import db, bcrypt
@@ -119,7 +119,7 @@ def book_meeting():
         db.session.commit()
         flash('Booking success!', 'success')
         return redirect(url_for('all_meetings'))
-    return render_template('book_room.html', title='Book Meeting', form=form)
+    return render_template('create_meeting.html', title='Book Meeting', form=form, legend='Create Meeting')
 
 
 @flask_app.route('/all_meetings', methods=['GET', 'POST'])
@@ -129,21 +129,40 @@ def all_meetings():
         meetings = Meeting.query.all()
     else:
         meetings = Meeting.query.filter_by(bookerId=current_user.id)
-    return render_template('all_meetings.html', meetings=meetings)
+    return render_template('all_meetings.html', meetings=meetings, legend='All meetings')
 
 
-@flask_app.route('/meeting/update/<int:meeting_id>', methods=['GET', 'PUT'])
+@flask_app.route('/meeting/update/<int:meeting_id>/update', methods=['GET', 'POST'])
+@login_required
 def meeting_update(meeting_id):
+    meeting = Meeting.query.get_or_404(meeting_id)
+
     form = BookmeetingForm()
     if form.validate_on_submit():
-        selected_meeting = Meeting.query.filter_by(id=meeting_id).first()
-        meeting = Meeting(title=form.title.data, teamId=team.id, roomId=room.id, bookerId=booker.id,
-                          date=form.date.data, startTime=form.startTime.data, endTime=endTime,
-                          duration=form.duration.data, is_confirmed=form.is_confirmed.data)
-        db.session.add(meeting)
+        booker = current_user
 
+        team = Team.query.filter_by(id=current_user.teamId).first()
+        room = Room.query.filter_by(id=form.rooms.data).first()
+        endTime = form.startTime.data + form.duration.data
+
+        participants_user = form.participants_user.data
+        if len(participants_user) > room.person_num:
+            flash('Max number of person reached!', 'danger')
+            return redirect(url_for('book_meeting'))
+        meeting.bookerId=booker.id,
+        meeting.date=form.date.data
+        meeting.startTime=form.startTime.data
+        meeting.endTime=endTime
+        meeting.duration=form.duration.data
+        meeting.is_confirmed=form.is_confirmed.data
         db.session.commit()
-        flash('Modification successful!', 'success')
+        flash('Meeting Modification successful!', 'success')
         return redirect(url_for('all_meetings'))
+    form.title.data = meeting.title
+    form.date.data = meeting.date
+    form.startTime.data = meeting.startTime
+    form.duration.data = meeting.duration
+    form.is_confirmed.data = meeting.is_confirmed
+    #form.participants_user.data = meeting.participants_user
 
-    return render_template('meeting_update.html', form=form)
+    return render_template('create_meeting.html', title='Update Meeting', form=form, legend='Update Meeting')

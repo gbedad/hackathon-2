@@ -81,12 +81,12 @@ class BookmeetingForm(FlaskForm):
     participants_user = SelectMultipleField('Choose participants',coerce=int,choices=UserChoice(),option_widget=widgets.CheckboxInput(),widget=widgets.ListWidget(prefix_label=False))
     is_confirmed = BooleanField('Confirm', false_values=(False, 'false', 0, '0'))
 
-    submit = SubmitField('Book')
+    submit = SubmitField('Confirm')
 
-    def validate_title(self, title):
+    '''def validate_title(self, title):
         meeting = Meeting.query.filter_by(title=self.title.data).first()
         if meeting is not None: # username exist
-            raise ValidationError('Please use another meeting title.')
+            raise ValidationError('Please use another meeting title.')'''
 
     def validate_date(self, date):
         if self.date.data < datetime.datetime.now().date():
