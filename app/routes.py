@@ -113,7 +113,7 @@ def book_meeting():
 
         meeting = Meeting(title=form.title.data, teamId=team.id, roomId=room.id, bookerId=booker.id,
                           date=form.date.data, startTime=form.startTime.data, endTime=endTime,
-                          duration=form.duration.data)
+                          duration=form.duration.data, is_confirmed=form.is_confirmed.data)
         db.session.add(meeting)
 
         db.session.commit()
@@ -130,3 +130,20 @@ def all_meetings():
     else:
         meetings = Meeting.query.filter_by(bookerId=current_user.id)
     return render_template('all_meetings.html', meetings=meetings)
+
+
+@flask_app.route('/meeting/update/<int:meeting_id>', methods=['GET', 'PUT'])
+def meeting_update(meeting_id):
+    form = BookmeetingForm()
+    if form.validate_on_submit():
+        selected_meeting = Meeting.query.filter_by(id=meeting_id).first()
+        meeting = Meeting(title=form.title.data, teamId=team.id, roomId=room.id, bookerId=booker.id,
+                          date=form.date.data, startTime=form.startTime.data, endTime=endTime,
+                          duration=form.duration.data, is_confirmed=form.is_confirmed.data)
+        db.session.add(meeting)
+
+        db.session.commit()
+        flash('Modification successful!', 'success')
+        return redirect(url_for('all_meetings'))
+
+    return render_template('meeting_update.html', form=form)

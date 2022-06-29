@@ -79,6 +79,7 @@ class BookmeetingForm(FlaskForm):
     startTime = SelectField('Choose starting time(in 24hr expression)',coerce=int,choices=[(i,i) for i in range(9,21)])
     duration = SelectField('Choose duration of the meeting(in hours)',coerce=int,choices=[(i,i) for i in range(1,6)])
     participants_user = SelectMultipleField('Choose participants',coerce=int,choices=UserChoice(),option_widget=widgets.CheckboxInput(),widget=widgets.ListWidget(prefix_label=False))
+    is_confirmed = BooleanField('Confirm', false_values=(False, 'false', 0, '0'))
 
     submit = SubmitField('Book')
 

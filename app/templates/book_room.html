@@ -35,6 +35,14 @@ Booking
                 <span style="color: red;">[{{ error }}]</span>
                 {% endfor %}
 
+         <dl>
+             {{ form.is_confirmed.label }}<br>
+            {{ form.is_confirmed }}<br>
+            {% for error in form.is_confirmed.errors %}
+            <span class="danger">[{{ error }}]</span>
+            {% endfor %}
+            </dl>
+
         <p>{{ form.submit() }}</p>
     </form>
 {% endblock %}

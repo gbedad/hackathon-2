@@ -49,6 +49,7 @@ class Meeting(db.Model):
     startTime = db.Column(db.Integer, nullable=False)
     endTime = db.Column(db.Integer, nullable=False)
     duration = db.Column(db.Integer, nullable=False)
+    is_confirmed = db.Column(db.Boolean, nullable=True)
     #participant_users=db.relationship('Participants_user',backref='meeting')
     #participant_partners=db.relationship('Participants_partner',backref='meeting')
 

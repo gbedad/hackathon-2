@@ -60,10 +60,10 @@
 
     {% if current_user.role == 'admin' %}
 
-    <a  class="list-group-item list-group-item-action test" href="#list-item-5">Add User</a >
-    <a  class="list-group-item list-group-item-action test" href="{{ url_for('create_room') }}">Create Room</a >
-    <a  class="list-group-item list-group-item-action test" href="#list-item-2">Delete Team</a >
-  <a  class="list-group-item list-group-item-action test" href="#list-item-3">Delete User</a >
+    <a  class="list-group-item list-group-item-action" style="color:#6CA6C1" href="#list-item-5">Add User</a >
+    <a  class="list-group-item list-group-item-action info" style="color:#6CA6C1"  href="{{ url_for('create_room') }}">Create Room</a >
+    <a  class="list-group-item list-group-item-action info" style="color:#6CA6C1"  href="#list-item-2">Delete Team</a >
+  <a  class="list-group-item list-group-item-action info" style="color:#6CA6C1"  href="#list-item-3">Delete User</a >
     {% endif %}
 {% endif %}
 </div>
