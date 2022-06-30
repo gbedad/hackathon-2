@@ -188,11 +188,12 @@ def book_meeting():
 @flask_app.route('/all_meetings', methods=['GET', 'POST'])
 @login_required
 def all_meetings():
+    page = request.args.get('page', 1, type=int)
     if current_user.role == 'admin':
-        page = request.args.get('page', 1, type=int)
+
         meetings = Meeting.query.paginate(page=page, per_page=10)
     else:
-        meetings = Meeting.query.filter_by(bookerId=current_user.id)
+        meetings = Meeting.query.filter_by(bookerId=current_user.id).paginate(page=page, per_page=10)
     return render_template('all_meetings.html', meetings=meetings, legend='All meetings')
 
 
