@@ -5,12 +5,12 @@
 <table border="1" cellpadding=3>
         <tr>
             <th>Room</th>
-            <th>Capacity</th>
+            <th >Capacity</th>
         </tr>
     {% for room in all_rooms %}
         <tr>
             <td>{{ room.roomName }}</td>
-            <td>{{ room.capacity }}</td>
+            <td class="text-center">{{ room.capacity }}</td>
         </tr>
     {% endfor %}
 </table>
@@ -28,9 +28,9 @@
         <td >{{ room.roomName }}</td>
         {% for hour in room.roomtime %}
         {% if hour %}
-        <td ><i class="bi bi-people"></i></td>
+        <td ><i class="bi bi-people text-danger"></i></td>
         {% else %} 
-        <td > <i class="bi bi-calendar"></i> </td>
+        <td > <i class="bi bi-calendar text-info"></i> </td>
         {% endif %}
         {% endfor %} 
     </tr>

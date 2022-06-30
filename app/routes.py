@@ -12,6 +12,11 @@ def home():
     return render_template('index.html')
 
 
+@flask_app.route('/about')
+def about():
+    return render_template('about.html')
+
+
 @flask_app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -121,10 +126,11 @@ def create_room():
 @flask_app.route('/room/<int:room_id>/update', methods=['GET', 'POST'])
 @login_required
 def room_update(room_id):
+    room = Room.query.get_or_404(room_id)
     if current_user.role != 'admin':
         flash('You need to have  admin role to update!', 'warning')
-        return redirect('room_update', roomId=room_id)
-    room = Room.query.get_or_404(room_id)
+        return redirect('show_rooms')
+
     form = CreateRoomForm()
     if form.validate_on_submit():
         room.roomName = form.roomName.data
@@ -256,6 +262,7 @@ def cancel_meeting(meeting_id):
 
 
 @flask_app.route('/occupied_rooms', methods=['GET', 'POST'])
+@login_required
 def occupied_rooms():
     form = OccupiedRoomsForm()
     if form.validate_on_submit():
