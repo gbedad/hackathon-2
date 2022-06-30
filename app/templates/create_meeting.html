@@ -28,14 +28,7 @@ Booking
             <dl>
                 {{ render_field(form.startTime) }}
                 {{ render_field(form.duration)}}
-            </dl>
-                {{ form.participants_user.label }}
-                {{ form.participants_user()}}
-                {% for error in form.participants_user.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-                {% endfor %}
 
-         <dl>
              {{ form.is_confirmed.label }}<br>
             {{ form.is_confirmed }}<br>
             {% for error in form.is_confirmed.errors %}

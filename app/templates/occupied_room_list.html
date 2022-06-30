@@ -5,11 +5,12 @@
 <table border="1" cellpadding=3>
         <tr>
             <th>Room</th>
+            <th>Capacity</th>
         </tr>
     {% for room in all_rooms %}
         <tr>
             <td>{{ room.roomName }}</td>
-
+            <td>{{ room.capacity }}</td>
         </tr>
     {% endfor %}
 </table>

@@ -74,7 +74,7 @@ def create_room():
     if form.validate_on_submit():
         room = Room.query.filter_by(id=form.id.data).first()
         if not room:
-            new_room = Room(id=form.id.data, roomName=form.roomName.data, person_num=form.person_num.data, remote=form.remote.data)
+            new_room = Room(id=form.id.data, roomName=form.roomName.data, capacity=form.capacity.data, remote=form.remote.data)
             db.session.add(new_room)
             db.session.commit()
             flash('Room created', 'success')
@@ -100,7 +100,6 @@ def book_meeting():
         meetingcollisions = Meeting.query.filter_by(date=datetime.datetime.combine(form.date.data,datetime.datetime.min.time())).filter_by(roomId=form.rooms.data).all()
         print(len(meetingcollisions))
         for meetingcollision in meetingcollisions:
-            # [a, b] overlaps with [x, y] iff b > x and a < y
             if (form.startTime.data < meetingcollision.endTime and (form.startTime.data+form.duration.data) > meetingcollision.startTime):
                 flash(f'The time from {meetingcollision.startTime} to {meetingcollision.endTime} is already booked by {User.query.filter_by(id=meetingcollision.bookerId).first().fullname}.', 'warning')
                 return redirect(url_for('book_meeting'))
@@ -111,15 +110,20 @@ def book_meeting():
         room = Room.query.filter_by(id=form.rooms.data).first()
         endTime = form.startTime.data + form.duration.data
 
-        participants_user = form.participants_user.data
-        if len(participants_user) > room.person_num:
-            flash('Max number of person reached!', 'danger')
-            return redirect(url_for('book_meeting'))
+        #participant_users = form.participant_users.data
+        #if len(participant_users) > room.capacity:
+            #flash('Max number of person reached!', 'danger')
+            #return redirect(url_for('book_meeting'))
 
         meeting = Meeting(title=form.title.data, teamId=team.id, roomId=room.id, bookerId=booker.id,
                           date=form.date.data, startTime=form.startTime.data, endTime=endTime,
                           duration=form.duration.data, is_confirmed=form.is_confirmed.data)
         db.session.add(meeting)
+
+        # Add participants records
+        '''for participant in participant_users:
+            participating = Participants_user(meeting=form.title.data, userId=participant)
+            db.session.add(participating)'''
 
         db.session.commit()
         flash('Booking success!', 'success')
@@ -150,10 +154,10 @@ def meeting_update(meeting_id):
         room = Room.query.filter_by(id=form.rooms.data).first()
         endTime = form.startTime.data + form.duration.data
 
-        participants_user = form.participants_user.data
-        if len(participants_user) > room.person_num:
-            flash('Max number of person reached!', 'danger')
-            return redirect(url_for('book_meeting'))
+        #participant_users = form.participant_users.data
+        #if len(participant_users) > room.capacity:
+            #flash('Max number of person reached!', 'danger')
+            #return redirect(url_for('book_meeting'))
         meeting.bookerId=booker.id,
         meeting.date=form.date.data
         meeting.startTime=form.startTime.data
@@ -168,7 +172,7 @@ def meeting_update(meeting_id):
     form.startTime.data = meeting.startTime
     form.duration.data = meeting.duration
     form.is_confirmed.data = meeting.is_confirmed
-    #form.participants_user.data = meeting.participants_user
+    #form.participant_users.data = meeting.participant_users
 
     return render_template('create_meeting.html', title='Update Meeting', form=form, legend='Update Meeting')
 
@@ -216,7 +220,7 @@ def occupied_rooms():
                         room_occupied['roomtime'][hour - 9] = True
                         break
             rooms_occupied.append(room_occupied)
-            all_rooms.append({'roomName': room.roomName})
+            all_rooms.append({'roomName': room.roomName, 'capacity': room.capacity})
         return render_template('occupied_room_list.html', title='Rooms Occupied',
                                                                     rooms_occupied=rooms_occupied, date=form.date.data,
                                    hours=[str(hour) for hour in hours], all_rooms=all_rooms)

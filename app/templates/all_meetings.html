@@ -19,7 +19,7 @@
         <td><a class="text-info text-decoration-none" href="{{ url_for('meeting_update', meeting_id=meeting.id) }}">{{ meeting.title }}</a></td>
         <td>{{ meeting.team.teamName}}</td>
         <td>{{ meeting.room.roomName}}</td>
-        <td>{{ meeting.who_booked}}</td>
+        <td>{{ meeting.booker.username}}</td>
         <td>{{ meeting.date.strftime('%Y-%m-%d')}}</td>
         <td>{{ meeting.startTime}}</td>
         <td>{{ meeting.duration}}</td>
