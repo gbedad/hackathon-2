@@ -14,7 +14,7 @@
         <th>Is Confirmed</th>
         <th>Cancel</th>
     </tr>
-{% for meeting in meetings %}
+{% for meeting in meetings.items %}
     <tr>
         <td><a class="text-info text-decoration-none" href="{{ url_for('meeting_update', meeting_id=meeting.id) }}">{{ meeting.title }}</a></td>
         <td>{{ meeting.team.teamName}}</td>
@@ -33,5 +33,15 @@
     </tr>
 {% endfor %}
 </table>
-
+{% for page_num in meetings.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+    {% if page_num %}
+        {% if meetings.page == page_num %}
+            <a class="btn btn-info mb-4" href="{{url_for('all_meetings', page=page_num)  }}">{{ page_num }}</a>
+        {% else %}
+            <a class="btn btn-outline-info mb-4" href="{{url_for('all_meetings', page=page_num)  }}">{{ page_num }}</a>
+        {% endif %}
+    {% else %}
+        ...
+    {% endif %}
+{% endfor %}
 {% endblock %}

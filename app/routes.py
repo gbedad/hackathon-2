@@ -189,7 +189,8 @@ def book_meeting():
 @login_required
 def all_meetings():
     if current_user.role == 'admin':
-        meetings = Meeting.query.all()
+        page = request.args.get('page', 1, type=int)
+        meetings = Meeting.query.paginate(page=page, per_page=10)
     else:
         meetings = Meeting.query.filter_by(bookerId=current_user.id)
     return render_template('all_meetings.html', meetings=meetings, legend='All meetings')
