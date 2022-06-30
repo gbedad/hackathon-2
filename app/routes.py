@@ -67,6 +67,40 @@ def account():
     return render_template('account.html', title='Account')
 
 
+@flask_app.route('/delete_user', methods=['GET', 'POST'])
+@login_required
+def delete_user():
+    if not current_user.is_authenticated:
+        flash('Please Log in as admin to delete user', 'danger')
+        return redirect(url_for('login'))
+    if current_user.role != 'admin':
+        flash('Please Log in as admin to delete user', 'danger')
+        return redirect(url_for('home'))
+
+    form = DeleteUserForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(id=form.ids.data).first()
+
+        meetings = Meeting.query.filter_by(bookerId=user.id).all()
+        hasFutureBooking = False
+        for meeting in meetings:
+            if meeting.date > datetime.datetime.now():
+                hasFutureBooking = True
+                break
+        if hasFutureBooking:
+            flash('You cannot delete a user that holds future bookings!', 'warning')
+            return redirect(url_for('delete_user'))
+        elif user.id == current_user.id:
+            flash('You cannot delete yourself!', 'danger')
+            return redirect(url_for('delete_user'))
+
+        db.session.delete(user)
+        db.session.commit()
+        flash(f'User {user.username} successfully deleted! ', 'success')
+        return redirect(url_for('home'))
+    return render_template('delete_user.html', title='Delete User', form=form)
+
+
 @flask_app.route('/create/room', methods=['GET', 'POST'])
 @login_required
 def create_room():

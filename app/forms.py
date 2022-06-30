@@ -72,6 +72,7 @@ class UserChoice(object):
             yield choice
 
 
+
 class BookmeetingForm(FlaskForm):
     title = StringField('Meeting title',validators=[DataRequired()])
     rooms = SelectField('Choose room',coerce=int,choices=RoomChoice())
@@ -96,3 +97,8 @@ class BookmeetingForm(FlaskForm):
 class OccupiedRoomsForm(FlaskForm):
     date = DateField('Choose date', format="%Y-%m-%d", validators=[DataRequired()])
     submit = SubmitField('Check')
+
+
+class DeleteUserForm(FlaskForm):
+    ids = SelectField('Choose User', coerce=int, choices=UserChoice())
+    submit = SubmitField('Delete')
