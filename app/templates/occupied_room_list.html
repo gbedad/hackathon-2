@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h1>Room details</h1>
+<table border="1" cellpadding=3>
+        <tr>
+            <th>Room</th>
+        </tr>
+    {% for room in all_rooms %}
+        <tr>
+            <td>{{ room.roomName }}</td>
+
+        </tr>
+    {% endfor %}
+</table>
+<hr>
+<h2>Rooms occupation status on {{date}}:</h2>
+<table cellpadding=5>
+    <tr class="p-3">
+        <th>Room</th>
+        {% for hour in hours %}
+        <th>{{hour}}</th>
+        {% endfor %}
+    </tr>
+{% for room in rooms_occupied %}
+    <tr class="m-3">
+        <td >{{ room.roomName }}</td>
+        {% for hour in room.roomtime %}
+        {% if hour %}
+        <td ><i class="bi bi-people"></i></td>
+        {% else %} 
+        <td > <i class="bi bi-calendar"></i> </td>
+        {% endif %}
+        {% endfor %} 
+    </tr>
+{% endfor %}
+</table>
+{% endblock %}

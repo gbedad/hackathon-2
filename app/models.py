@@ -15,7 +15,11 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(64), nullable=False)
     role = db.Column(db.String(64), nullable=False)
     teamId = db.Column(db.Integer, db.ForeignKey('team.id'), nullable=False)
-    #meetings = db.relationship('Meeting', backref='booker', lazy='dynamic')
+    participants = db.relationship('Participants_user', backref='user', lazy='dynamic')
+    meetings = db.relationship('Meeting', backref='booker', lazy='dynamic')
+
+    def __repr__(self):
+        return f'<User {self.username}>'
 
 
 class Team(db.Model):
@@ -50,10 +54,16 @@ class Meeting(db.Model):
     endTime = db.Column(db.Integer, nullable=False)
     duration = db.Column(db.Integer, nullable=False)
     is_confirmed = db.Column(db.Boolean, nullable=True)
-    #participant_users=db.relationship('Participants_user',backref='meeting')
+    #participant_users = db.relationship('Participants_user', backref='meeting')
     #participant_partners=db.relationship('Participants_partner',backref='meeting')
 
     def __repr__(self):
         return f'Meeting {self.id} for {self.id} last for {self.duration}'
+
+
+class Participants_user(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    meeting = db.Column(db.String(64), db.ForeignKey('meeting.title'))
+    userId = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 

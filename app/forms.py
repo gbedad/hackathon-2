@@ -93,3 +93,6 @@ class BookmeetingForm(FlaskForm):
             raise ValidationError('You can only book for day after today.')
 
 
+class OccupiedRoomsForm(FlaskForm):
+    date = DateField('Choose date', format="%Y-%m-%d", validators=[DataRequired()])
+    submit = SubmitField('Check')

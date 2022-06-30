@@ -96,10 +96,15 @@ def show_rooms():
 def book_meeting():
     form = BookmeetingForm()
     if form.validate_on_submit():
+        # check time collision
+        meetingcollisions = Meeting.query.filter_by(date=datetime.datetime.combine(form.date.data,datetime.datetime.min.time())).filter_by(roomId=form.rooms.data).all()
+        print(len(meetingcollisions))
+        for meetingcollision in meetingcollisions:
+            # [a, b] overlaps with [x, y] iff b > x and a < y
+            if (form.startTime.data < meetingcollision.endTime and (form.startTime.data+form.duration.data) > meetingcollision.startTime):
+                flash(f'The time from {meetingcollision.startTime} to {meetingcollision.endTime} is already booked by {User.query.filter_by(id=meetingcollision.bookerId).first().fullname}.', 'warning')
+                return redirect(url_for('book_meeting'))
 
-
-
-        # make booking
         booker = current_user
 
         team = Team.query.filter_by(id=current_user.teamId).first()
@@ -132,7 +137,7 @@ def all_meetings():
     return render_template('all_meetings.html', meetings=meetings, legend='All meetings')
 
 
-@flask_app.route('/meeting/update/<int:meeting_id>/update', methods=['GET', 'POST'])
+@flask_app.route('/meeting/<int:meeting_id>/update', methods=['GET', 'POST'])
 @login_required
 def meeting_update(meeting_id):
     meeting = Meeting.query.get_or_404(meeting_id)
@@ -166,3 +171,59 @@ def meeting_update(meeting_id):
     #form.participants_user.data = meeting.participants_user
 
     return render_template('create_meeting.html', title='Update Meeting', form=form, legend='Update Meeting')
+
+
+@flask_app.route('/meeting/<int:meeting_id>/delete', methods=['POST'])
+@login_required
+def cancel_meeting(meeting_id):
+
+    meeting = Meeting.query.get_or_404(meeting_id)
+    print(meeting.title)
+
+    if meeting.date <= datetime.datetime.now():
+        flash('You cannot delete past meeting', 'warning')
+        return redirect(url_for('all_meetings'))
+
+    '''participants_user = Participants_user.query.filter_by(meeting=meeting.title).all()
+    for participant in participants_user:
+        print(participant)
+        db.session.delete(participant)'''
+
+    db.session.delete(meeting)
+    db.session.commit()
+    flash(f'Meeting "{meeting.title}" has been deleted', 'success')
+    return redirect(url_for('all_meetings'))
+
+
+@flask_app.route('/occupied_rooms', methods=['GET', 'POST'])
+def occupied_rooms():
+    form = OccupiedRoomsForm()
+    if form.validate_on_submit():
+        rooms_occupied = []
+        hours = range(9, 23)
+        rooms = Room.query.all()
+        all_rooms = []
+        for room in rooms:
+            room_occupied = dict()
+            room_occupied['roomName'] = room.roomName
+            room_occupied['roomtime'] = [False]*14
+            for hour in hours:
+                meetings = Meeting.query.filter_by(date=datetime.datetime.combine(form.date.data,  datetime.datetime.min.time()))\
+                    .filter_by(roomId=room.id).filter(Meeting.is_confirmed==True).all()
+
+                for meeting in meetings:
+                    if meeting.endTime > (hour + 0.5) > meeting.startTime:
+                        room_occupied['roomtime'][hour - 9] = True
+                        break
+            rooms_occupied.append(room_occupied)
+            all_rooms.append({'roomName': room.roomName})
+        return render_template('occupied_room_list.html', title='Rooms Occupied',
+                                                                    rooms_occupied=rooms_occupied, date=form.date.data,
+                                   hours=[str(hour) for hour in hours], all_rooms=all_rooms)
+    return render_template('occupied_rooms.html', title='Room Occupation', form=form)
+
+
+
+
+
+
