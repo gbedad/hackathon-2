@@ -4,16 +4,18 @@
 <h1>All rooms</h1>
 <div class="row row-cols-1 row-cols-md-3 g-2">
 {% for room in rooms %}
-    <div class="col">
-<div class="card border-info mb-3" style="max-width: 18rem;">
-  <div class="card-header bg-transparent border-info">id: {{room.id}}</div>
-  <div class="card-body text-info">
-    <h5 class="card-title">Room: {{room.roomName}}</h5>
-    <p class="card-text">Number of persons: {{room.capacity}}</p>
-  </div>
-  <div class="card-footer bg-transparent border-info"> {{ 'Remote' if room.remote else 'Face-to-Face' }}</div>
-</div>
-    </div>
+    <a class =  "text-decoration-none" href="{{ url_for('room_update', room_id=room.id) }}">
+        <div class="col">
+            <div class="card border-info mb-3" style="max-width: 18rem;">
+              <div class="card-header bg-transparent border-info">id: {{room.id}}</div>
+              <div class="card-body text-info">
+                <h5 class="card-title">Room: {{room.roomName}}</h5>
+                <p class="card-text">Number of persons: {{room.capacity}}</p>
+              </div>
+              <div class="card-footer bg-transparent border-info"> {{ 'Remote' if room.remote else 'Face-to-Face' }}</div>
+            </div>
+        </div>
+    </a>
 {% endfor %}
 </div>
 

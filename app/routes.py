@@ -97,7 +97,7 @@ def delete_user():
         db.session.delete(user)
         db.session.commit()
         flash(f'User {user.username} successfully deleted! ', 'success')
-        return redirect(url_for('home'))
+        return redirect(url_for('account'))
     return render_template('delete_user.html', title='Delete User', form=form)
 
 
@@ -115,7 +115,27 @@ def create_room():
             return redirect(url_for('show_rooms'))
         else:
             flash('Room already existing', 'danger')
-    return render_template('create_room.html', title='Create Room', form=form)
+    return render_template('create_room.html', title='Create Room', form=form, legend='Create room')
+
+
+@flask_app.route('/room/<int:room_id>/update', methods=['GET', 'POST'])
+@login_required
+def room_update(room_id):
+    if current_user.role != 'admin':
+        flash('You need to have  admin role to update!', 'warning')
+        return redirect('room_update', roomId=room_id)
+    room = Room.query.get_or_404(room_id)
+    form = CreateRoomForm()
+    if form.validate_on_submit():
+        room.roomName = form.roomName.data
+        room.capacity = form.capacity.data
+        db.session.commit()
+        flash('Room Modification successful!', 'success')
+        return redirect(url_for('show_rooms'))
+    form.id.data = room.id
+    form.roomName.data = room.roomName
+    form.capacity.data = room.capacity
+    return render_template('create_room.html', title='Update Room', form=form, legend='Update room')
 
 
 @flask_app.route('/show_rooms', methods=['GET'])
