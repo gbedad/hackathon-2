@@ -6,7 +6,7 @@
 {% for room in rooms %}
     <a class =  "text-decoration-none" href="{{ url_for('room_update', room_id=room.id) }}">
         <div class="col">
-            <div class="card border-info mb-3" style="max-width: 18rem;">
+            <div class="card border-info text-bg-light mb-3" style="max-width: 18rem;">
               <div class="card-header bg-transparent border-info">id: {{room.id}}</div>
               <div class="card-body text-info">
                 <h5 class="card-title">Room: {{room.roomName}}</h5>

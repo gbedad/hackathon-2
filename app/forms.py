@@ -72,6 +72,14 @@ class UserChoice(object):
             yield choice
 
 
+class StudentChoice(object):
+    def __iter__(self):
+        students=Student.query.all()
+        choices=[(student.id,f'{student.fullname}') for student in students]
+        #choices=[choice for choice in choices if choice[1]!='admin'] # do not delete admin
+        for choice in choices:
+            yield choice
+
 
 class BookmeetingForm(FlaskForm):
     title = StringField('Meeting title',validators=[DataRequired()])
@@ -79,10 +87,11 @@ class BookmeetingForm(FlaskForm):
     date = DateField('Choose date', format="%Y-%m-%d", validators=[DataRequired()])
     startTime = SelectField('Choose starting time(in 24hr expression)',coerce=int,choices=[(i,i) for i in range(9,21)])
     duration = SelectField('Choose duration of the meeting(in hours)',coerce=int,choices=[(i,i) for i in range(1,6)])
-    #participant_users = SelectMultipleField('Choose participants',coerce=int,choices=UserChoice(),option_widget=widgets.CheckboxInput(),widget=widgets.ListWidget(prefix_label=False))
+    participant_student = SelectMultipleField('Choose students',coerce=int,choices=StudentChoice(),option_widget=widgets.CheckboxInput(),widget=widgets.ListWidget(prefix_label=False))
+    students = IntegerField('Select number of students', validators=[DataRequired()])
     is_confirmed = BooleanField('Confirm', false_values=(False, 'false', 0, '0'))
 
-    submit = SubmitField('Confirm')
+    submit = SubmitField('Submit')
 
     '''def validate_title(self, title):
         meeting = Meeting.query.filter_by(title=self.title.data).first()
@@ -102,3 +111,12 @@ class OccupiedRoomsForm(FlaskForm):
 class DeleteUserForm(FlaskForm):
     ids = SelectField('Choose User', coerce=int, choices=UserChoice())
     submit = SubmitField('Delete')
+
+
+class CreateStudentFom(FlaskForm):
+    id = IntegerField('Id', validators=[DataRequired()])
+    fullname = StringField('Full Name', validators=[DataRequired()])
+    email = StringField('Email')
+    grade = SelectField('Grade', coerce=int, choices=[(i, i) for i in range(0, 11)])
+
+    submit = SubmitField('Submit')

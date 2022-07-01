@@ -15,7 +15,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(64), nullable=False)
     role = db.Column(db.String(64), nullable=False)
     teamId = db.Column(db.Integer, db.ForeignKey('team.id'), nullable=False)
-    #participants = db.relationship('Participants_user', foreign_keys="Participants_user.userId")
+    #participants = db.relationship('ParticipantStudent', backref='meeting')
     meetings = db.relationship('Meeting', backref='booker', lazy='dynamic')
 
     def __repr__(self):
@@ -43,6 +43,19 @@ class Room(db.Model):
         return f'Room {self.roomName}'
 
 
+class Student(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    fullname = db.Column(db.String(64), nullable=False)
+    email = db.Column(db.String(64), nullable=True)
+    grade = db.Column(db.String(64), nullable=True)
+
+
+class ParticipantStudent(db.Model):
+    id = db.Column(db.Integer, primary_key=True, unique=True)
+    meeting = db.Column(db.Integer, db.ForeignKey('meeting.id'))
+    studentId = db.Column(db.Integer, db.ForeignKey('student.id'))
+
+
 class Meeting(db.Model):
     id = db.Column(db.Integer, primary_key=True, nullable=False, unique=True)
     title = db.Column(db.String(64), nullable=False)
@@ -54,7 +67,8 @@ class Meeting(db.Model):
     endTime = db.Column(db.Integer, nullable=False)
     duration = db.Column(db.Integer, nullable=False)
     is_confirmed = db.Column(db.Boolean, nullable=True)
-    #participant_users = db.relationship('Participants_user', foreign_keys="Participants_user.meeting")
+    students = db.Column(db.Integer, nullable=True)
+    #participant_students = db.relationship('ParticipantStudent', backref='meeting')
 
     def __repr__(self):
         return f'Meeting {self.id} for {self.id} last for {self.duration}'
@@ -64,5 +78,9 @@ class Meeting(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     meeting = db.Column(db.String(64), db.ForeignKey('meeting.title'))
     userId = db.Column(db.Integer, db.ForeignKey('user.id'))'''
+
+
+# TODO add a Student model
+
 
 

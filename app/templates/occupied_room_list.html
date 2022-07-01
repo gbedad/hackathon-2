@@ -24,11 +24,12 @@
         {% endfor %}
     </tr>
 {% for room in rooms_occupied %}
+
     <tr class="m-3">
         <td >{{ room.roomName }}</td>
         {% for hour in room.roomtime %}
-        {% if hour %}
-        <td ><i class="bi bi-people text-danger"></i></td>
+        {% if hour and room.n_students %}
+        <td ><span class="badge bg-success fs-sm">{{room.n_students + 1}}</span></td>
         {% else %} 
         <td > <i class="bi bi-calendar text-info"></i> </td>
         {% endif %}

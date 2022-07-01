@@ -42,7 +42,8 @@ def register():
 
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        user = User(username=form.username.data, password=hashed_password,email=form.email.data, fullname=form.fullname.data, role=form.role.data,teamId=form.teamId.data)
+        user = User(username=form.username.data, password=hashed_password, email=form.email.data,
+                    fullname=form.fullname.data, role=form.role.data, teamId=form.teamId.data)
         db.session.add(user)
         team = Team.query.filter_by(id=user.teamId).first()
         if team is None:
@@ -113,7 +114,8 @@ def create_room():
     if form.validate_on_submit():
         room = Room.query.filter_by(id=form.id.data).first()
         if not room:
-            new_room = Room(id=form.id.data, roomName=form.roomName.data, capacity=form.capacity.data, remote=form.remote.data)
+            new_room = Room(id=form.id.data, roomName=form.roomName.data, capacity=form.capacity.data,
+                            remote=form.remote.data)
             db.session.add(new_room)
             db.session.commit()
             flash('Room created', 'success')
@@ -154,14 +156,18 @@ def show_rooms():
 @flask_app.route('/book', methods=['GET', 'POST'])
 @login_required
 def book_meeting():
+    capacity_reached = False
     form = BookmeetingForm()
     if form.validate_on_submit():
         # check time collision
-        meetingcollisions = Meeting.query.filter_by(date=datetime.datetime.combine(form.date.data,datetime.datetime.min.time())).filter_by(roomId=form.rooms.data).all()
-        print(len(meetingcollisions))
-        for meetingcollision in meetingcollisions:
-            if (form.startTime.data < meetingcollision.endTime and (form.startTime.data+form.duration.data) > meetingcollision.startTime):
-                flash(f'The time from {meetingcollision.startTime} to {meetingcollision.endTime} is already booked by {User.query.filter_by(id=meetingcollision.bookerId).first().fullname}.', 'warning')
+        check_slot = Meeting.query.filter_by(date=form.date.data).filter_by(roomId=form.rooms.data).all()
+        print(check_slot)
+        for slot in check_slot:
+            if (form.startTime.data < slot.endTime and (
+                    form.startTime.data + form.duration.data) > slot.startTime):
+                flash(
+                    f'The time from {slot.startTime} to {slot.endTime} is already booked by {User.query.filter_by(id=slot.bookerId).first().fullname}.',
+                    'warning')
                 return redirect(url_for('book_meeting'))
 
         booker = current_user
@@ -170,14 +176,14 @@ def book_meeting():
         room = Room.query.filter_by(id=form.rooms.data).first()
         endTime = form.startTime.data + form.duration.data
 
-        #participant_users = form.participant_users.data
-        #if len(participant_users) > room.capacity:
-            #flash('Max number of person reached!', 'danger')
-            #return redirect(url_for('book_meeting'))
+        # participant_users = form.participant_users.data
+        # if len(participant_users) > room.capacity:
+        # flash('Max number of person reached!', 'danger')
+        # return redirect(url_for('book_meeting'))
 
         meeting = Meeting(title=form.title.data, teamId=team.id, roomId=room.id, bookerId=booker.id,
                           date=form.date.data, startTime=form.startTime.data, endTime=endTime,
-                          duration=form.duration.data, is_confirmed=form.is_confirmed.data)
+                          duration=form.duration.data, students=form.students.data, is_confirmed=form.is_confirmed.data)
         db.session.add(meeting)
 
         # Add participants records
@@ -197,7 +203,7 @@ def all_meetings():
     page = request.args.get('page', 1, type=int)
     if current_user.role == 'admin':
 
-        meetings = Meeting.query.paginate(page=page, per_page=10)
+        meetings = Meeting.query.paginate(page=page, per_page=8)
     else:
         meetings = Meeting.query.filter_by(bookerId=current_user.id).paginate(page=page, per_page=10)
     return render_template('all_meetings.html', meetings=meetings, legend='All meetings')
@@ -216,16 +222,17 @@ def meeting_update(meeting_id):
         room = Room.query.filter_by(id=form.rooms.data).first()
         endTime = form.startTime.data + form.duration.data
 
-        #participant_users = form.participant_users.data
-        #if len(participant_users) > room.capacity:
-            #flash('Max number of person reached!', 'danger')
-            #return redirect(url_for('book_meeting'))
-        meeting.bookerId=booker.id,
-        meeting.date=form.date.data
-        meeting.startTime=form.startTime.data
-        meeting.endTime=endTime
-        meeting.duration=form.duration.data
-        meeting.is_confirmed=form.is_confirmed.data
+        # participant_users = form.participant_users.data
+        # if len(participant_users) > room.capacity:
+        # flash('Max number of person reached!', 'danger')
+        # return redirect(url_for('book_meeting'))
+        meeting.bookerId = booker.id,
+        meeting.date = form.date.data
+        meeting.startTime = form.startTime.data
+        meeting.endTime = endTime
+        meeting.duration = form.duration.data
+        meeting.students = form.students.data
+        meeting.is_confirmed = form.is_confirmed.data
         db.session.commit()
         flash('Meeting Modification successful!', 'success')
         return redirect(url_for('all_meetings'))
@@ -233,8 +240,9 @@ def meeting_update(meeting_id):
     form.date.data = meeting.date
     form.startTime.data = meeting.startTime
     form.duration.data = meeting.duration
+    form.students.data = meeting.students
     form.is_confirmed.data = meeting.is_confirmed
-    #form.participant_users.data = meeting.participant_users
+    # form.participant_users.data = meeting.participant_users
 
     return render_template('create_meeting.html', title='Update Meeting', form=form, legend='Update Meeting')
 
@@ -242,7 +250,6 @@ def meeting_update(meeting_id):
 @flask_app.route('/meeting/<int:meeting_id>/delete', methods=['POST'])
 @login_required
 def cancel_meeting(meeting_id):
-
     meeting = Meeting.query.get_or_404(meeting_id)
     print(meeting.title)
 
@@ -272,25 +279,46 @@ def occupied_rooms():
         all_rooms = []
         for room in rooms:
             room_occupied = dict()
+            room_occupied['roomId'] = room.id
             room_occupied['roomName'] = room.roomName
-            room_occupied['roomtime'] = [False]*14
-            for hour in hours:
-                meetings = Meeting.query.filter_by(date=datetime.datetime.combine(form.date.data,  datetime.datetime.min.time()))\
-                    .filter_by(roomId=room.id).filter(Meeting.is_confirmed==True).all()
+            room_occupied['roomtime'] = [False] * 14
 
+            for hour in hours:
+
+                meetings = Meeting.query.filter_by(
+                    date=form.date.data).filter_by(roomId=room.id).filter(Meeting.is_confirmed == True).all()
                 for meeting in meetings:
                     if meeting.endTime > (hour + 0.5) > meeting.startTime:
                         room_occupied['roomtime'][hour - 9] = True
+                        room_occupied['n_students'] = meeting.students
+                        print(meeting.students)
                         break
             rooms_occupied.append(room_occupied)
             all_rooms.append({'roomName': room.roomName, 'capacity': room.capacity})
         return render_template('occupied_room_list.html', title='Rooms Occupied',
-                                                                    rooms_occupied=rooms_occupied, date=form.date.data,
-                                   hours=[str(hour) for hour in hours], all_rooms=all_rooms)
+                               rooms_occupied=rooms_occupied, date=form.date.data,
+                               hours=[str(hour) for hour in hours], all_rooms=all_rooms)
     return render_template('occupied_rooms.html', title='Room Occupation', form=form)
 
+# TODO create route add student for role admin
+# TODO modify available rooms route in order to count persons in room and raise Exception when capacity reached
 
 
-
-
-
+@flask_app.route('/add_student', methods=['GET', 'POST'])
+@login_required
+def add_student():
+    if current_user.role != 'admin':
+        flash('You need to have admin role to add student!', 'warning')
+        return render_template('home')
+    form = CreateStudentFom()
+    if form.validate_on_submit():
+        student = Student.query.filter_by(id=form.id.data).first()
+        if not student:
+            new_student = Student(id=form.id.data, fullname=form.fullname.data, email=form.email.data,  grade=form.grade.data)
+            db.session.add(new_student)
+            db.session.commit()
+            flash('Student created', 'success')
+            return redirect(url_for('home'))
+        else:
+            flash('Student already existing', 'danger')
+    return render_template('create_student.html', title='Create Student', form=form, legend='Create Student')
