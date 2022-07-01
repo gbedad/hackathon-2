@@ -28,9 +28,13 @@
     <tr class="m-3">
         <td >{{ room.roomName }}</td>
         {% for hour in room.roomtime %}
-        {% if hour and room.n_students %}
-        <td ><span class="badge bg-success fs-sm">{{room.n_students + 1}}</span></td>
-        {% else %} 
+        {% if hour["org"] %}
+            {% if hour["students_num"]+1==room.load %}
+                <td ><a href="{{url_for('meeting_update',meeting_id=hour["meetingId"])}}"><span class="badge bg-danger fs-sm">{{hour["students_num"] + 1}}</span></a></td>
+            {% else %}
+                <td ><a href="{{url_for('meeting_update',meeting_id=hour["meetingId"])}}"><span class="badge bg-success fs-sm">{{hour["students_num"] + 1}}</span></a></td>
+            {% endif %}
+        {% else %}
         <td > <i class="bi bi-calendar text-info"></i> </td>
         {% endif %}
         {% endfor %} 

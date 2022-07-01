@@ -175,6 +175,9 @@ def book_meeting():
         team = Team.query.filter_by(id=current_user.teamId).first()
         room = Room.query.filter_by(id=form.rooms.data).first()
         endTime = form.startTime.data + form.duration.data
+        check_capacity = room.capacity
+
+        print(form.students.data, check_capacity)
 
         # participant_users = form.participant_users.data
         # if len(participant_users) > room.capacity:
@@ -184,6 +187,11 @@ def book_meeting():
         meeting = Meeting(title=form.title.data, teamId=team.id, roomId=room.id, bookerId=booker.id,
                           date=form.date.data, startTime=form.startTime.data, endTime=endTime,
                           duration=form.duration.data, students=form.students.data, is_confirmed=form.is_confirmed.data)
+        if check_capacity < meeting.students - 1:
+            flash('You cannot exceed the room capacity', 'warning')
+            return redirect(
+                url_for('meeting_update', meeting_id=meeting.id)
+            )
         db.session.add(meeting)
 
         # Add participants records
@@ -221,6 +229,9 @@ def meeting_update(meeting_id):
         team = Team.query.filter_by(id=current_user.teamId).first()
         room = Room.query.filter_by(id=form.rooms.data).first()
         endTime = form.startTime.data + form.duration.data
+        check_capacity = room.capacity
+        print(check_capacity, meeting.students)
+
 
         # participant_users = form.participant_users.data
         # if len(participant_users) > room.capacity:
@@ -233,11 +244,17 @@ def meeting_update(meeting_id):
         meeting.duration = form.duration.data
         meeting.students = form.students.data
         meeting.is_confirmed = form.is_confirmed.data
+        if check_capacity < meeting.students - 1:
+            flash('You cannot exceed the room capacity', 'warning')
+            return redirect(
+                url_for('meeting_update', meeting_id=meeting.id)
+            )
         db.session.commit()
         flash('Meeting Modification successful!', 'success')
         return redirect(url_for('all_meetings'))
     form.title.data = meeting.title
     form.date.data = meeting.date
+    form.rooms.data=meeting.roomId
     form.startTime.data = meeting.startTime
     form.duration.data = meeting.duration
     form.students.data = meeting.students
@@ -281,7 +298,8 @@ def occupied_rooms():
             room_occupied = dict()
             room_occupied['roomId'] = room.id
             room_occupied['roomName'] = room.roomName
-            room_occupied['roomtime'] = [False] * 14
+            room_occupied['roomtime'] = [{'org':False,'students_num': 0, 'meetingId': 0}] * 14
+            room_occupied['load'] = room.capacity
 
             for hour in hours:
 
@@ -289,11 +307,12 @@ def occupied_rooms():
                     date=form.date.data).filter_by(roomId=room.id).filter(Meeting.is_confirmed == True).all()
                 for meeting in meetings:
                     if meeting.endTime > (hour + 0.5) > meeting.startTime:
-                        room_occupied['roomtime'][hour - 9] = True
-                        room_occupied['n_students'] = meeting.students
-                        print(meeting.students)
+                        room_occupied['roomtime'][hour - 9] = {'org':True, 'students_num': meeting.students, 'meetingId': meeting.id}
+
+                        print(meeting.id)
                         break
             rooms_occupied.append(room_occupied)
+            print(rooms_occupied)
             all_rooms.append({'roomName': room.roomName, 'capacity': room.capacity})
         return render_template('occupied_room_list.html', title='Rooms Occupied',
                                rooms_occupied=rooms_occupied, date=form.date.data,
