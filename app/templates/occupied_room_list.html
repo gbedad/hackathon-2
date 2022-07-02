@@ -30,9 +30,9 @@
         {% for hour in room.roomtime %}
         {% if hour["test"] %}
             {% if hour["sum_st"]>=room.load %}
-                <td ><a href=""><span class="badge bg-danger fs-sm">{{hour["sum_st"]}}</span></a></td>
+                <td ><a href="{{url_for('all_meetings_by_date',booking_date=date, room_id=room["roomId"], time=room["roomtime"].index(hour)+9) }}"><span class="badge bg-danger fs-sm">{{hour["sum_st"]}}</span></a></td>
             {% else %}
-                <td ><a href=""><span class="badge bg-success fs-sm">{{hour["sum_st"]}}</span></a></td>
+                <td ><a href="{{url_for('all_meetings_by_date',booking_date=date, room_id=room["roomId"], time=room["roomtime"].index(hour)+9) }}"><span class="badge bg-success fs-sm">{{hour["sum_st"]}}</span></a></td>
             {% endif %}
         {% else %}
         <td > <i class="bi bi-calendar text-info"></i> </td>

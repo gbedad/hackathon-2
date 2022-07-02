@@ -223,6 +223,18 @@ def all_meetings():
     return render_template('all_meetings.html', meetings=meetings, legend='All Meetings')
 
 
+@flask_app.route('/all_meetings/<booking_date>/<int:time>/<room_id>', methods=['GET', 'POST'])
+@login_required
+def all_meetings_by_date(booking_date=None, time=None, room_id=None):
+    page = request.args.get('page', 1, type=int)
+    if current_user.role == 'admin':
+
+        meetings = Meeting.query.filter_by(date=booking_date).filter_by(roomId=room_id).filter_by(startTime=time).order_by(Meeting.date).order_by(Meeting.startTime).paginate(page=page, per_page=8)
+    else:
+        meetings = Meeting.query.filter_by(date=booking_date).filter_by(roomId=room_id).filter_by(startTime=time).filter_by(bookerId=current_user.id).order_by(Meeting.date).order_by(Meeting.startTime).paginate(page=page, per_page=10)
+    return render_template('all_meetings.html', meetings=meetings, legend=f'All Meetings on {booking_date} ')
+
+
 @flask_app.route('/meeting/<int:meeting_id>/update', methods=['GET', 'POST'])
 @login_required
 def meeting_update(meeting_id):
