@@ -156,7 +156,7 @@ def show_rooms():
 @flask_app.route('/book', methods=['GET', 'POST'])
 @login_required
 def book_meeting():
-    capacity_reached = False
+
     form = BookmeetingForm()
     if form.validate_on_submit():
         booker = current_user
@@ -188,8 +188,6 @@ def book_meeting():
                     'warning')
                 return redirect(url_for('book_meeting'))"""
 
-
-
         print(form.students.data, check_capacity)
 
         # participant_users = form.participant_users.data
@@ -200,11 +198,6 @@ def book_meeting():
         meeting = Meeting(title=form.title.data, teamId=team.id, roomId=room.id, bookerId=booker.id,
                           date=form.date.data, startTime=form.startTime.data, endTime=endTime,
                           duration=form.duration.data, students=form.students.data, is_confirmed=form.is_confirmed.data)
-        if check_capacity < meeting.students - 1:
-            flash('You cannot exceed the room capacity', 'warning')
-            return redirect(
-                url_for('meeting_update', meeting_id=meeting.id)
-            )
         db.session.add(meeting)
 
         # Add participants records
@@ -321,13 +314,13 @@ def occupied_rooms():
 
             for hour in hours:
 
-                #room_occupied['roomId'] = my_meeting[0]
                 meetings = Meeting.query.filter_by(
                     date=form.date.data).filter_by(roomId=room.id).all()
                 for my_meeting in all_the_meetings:
                     if my_meeting[1] == hour and my_meeting[0] == room.id:
 
                         room_occupied['roomtime'][hour - 9] = {'test': True, 'sum_st': my_meeting[2]}
+                        break
 
                 '''for meeting in meetings:
                     if meeting.endTime > (hour + 0.5) > meeting.startTime:

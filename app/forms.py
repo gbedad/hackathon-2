@@ -85,9 +85,9 @@ class BookmeetingForm(FlaskForm):
     rooms = SelectField('Choose room',coerce=int,choices=RoomChoice())
     date = DateField('Choose date', format="%Y-%m-%d", validators=[DataRequired()])
     startTime = SelectField('Choose starting time(in 24hr expression)',coerce=int,choices=[(i,i) for i in range(9,21)])
-    duration = SelectField('Choose duration of the meeting(in hours)',coerce=int,choices=[(i,i) for i in range(1,6)])
+    duration = SelectField('Choose duration of the meeting(in hours)',coerce=int,choices=[(i,i) for i in range(1,2)])
     participant_student = SelectMultipleField('Choose students',coerce=int,choices=StudentChoice(),option_widget=widgets.CheckboxInput(),widget=widgets.ListWidget(prefix_label=False))
-    students = IntegerField('Select number of students', validators=[DataRequired()])
+    students = IntegerField('Person num (including teacher)', validators=[DataRequired()])
     is_confirmed = BooleanField('Confirm', false_values=(False, 'false', 0, '0'))
 
     submit = SubmitField('Submit')
@@ -100,6 +100,10 @@ class BookmeetingForm(FlaskForm):
     def validate_date(self, date):
         if self.date.data < datetime.datetime.now().date():
             raise ValidationError('You can only book for day after today.')
+
+    def validate_number(self, num):
+        if self.students.data <= 0:
+            raise ValueError('The number of person must be positive')
 
 
 class OccupiedRoomsForm(FlaskForm):
