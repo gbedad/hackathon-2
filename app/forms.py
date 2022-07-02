@@ -5,7 +5,6 @@ from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 from app.models import *
 
 
-
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
@@ -120,3 +119,15 @@ class CreateStudentFom(FlaskForm):
     grade = SelectField('Grade', coerce=int, choices=[(i, i) for i in range(0, 11)])
 
     submit = SubmitField('Submit')
+
+
+class CreateTeamForm(FlaskForm):
+    id = IntegerField('Id', validators=[DataRequired()])
+    teamName = StringField('Room Name', validators=[DataRequired()])
+
+    submit = SubmitField('Create Team')
+
+    def validate_room(self, teamId):
+        team = Team.query.filter_by(id=self.teamId.data).first()
+        if team is not None:  # username exist
+            raise ValidationError('Please use a different team id.')

@@ -58,7 +58,7 @@ def register():
             flash('Registered to an existing team', 'success')
             return redirect(url_for('login'))
 
-    return render_template('register.html', title='Register', form=form)
+    return render_template('register.html', title='Register', form=form, legend='Registration Form')
 
 
 @flask_app.route('/logout')
@@ -172,8 +172,8 @@ def book_meeting():
         check_slot = Meeting.query.filter_by(date=form.date.data).filter_by(roomId=form.rooms.data).first()
 
         for slot_booked in all_the_meetings:
-            if room.id == slot_booked[0]  and form.startTime.data == slot_booked[1] and slot_booked[2] >= room.capacity:
-                flash('Cannot exceed room capacity', 'warning')
+            if room.id == slot_booked[0] and form.startTime.data == slot_booked[1] and (slot_booked[2] + form.students.data) >= room.capacity:
+                flash(f'Already {slot_booked[2]} students. Cannot exceed room capacity', 'warning')
                 return redirect(url_for('book_meeting'))
 
 
@@ -227,7 +227,7 @@ def all_meetings():
         meetings = Meeting.query.order_by(Meeting.date).order_by(Meeting.startTime).paginate(page=page, per_page=8)
     else:
         meetings = Meeting.query.filter_by(bookerId=current_user.id).order_by(Meeting.date).order_by(Meeting.startTime).paginate(page=page, per_page=10)
-    return render_template('all_meetings.html', meetings=meetings, legend='All meetings')
+    return render_template('all_meetings.html', meetings=meetings, legend='All Meetings')
 
 
 @flask_app.route('/meeting/<int:meeting_id>/update', methods=['GET', 'POST'])
@@ -366,3 +366,48 @@ def add_student():
         else:
             flash('Student already existing', 'danger')
     return render_template('create_student.html', title='Create Student', form=form, legend='Create Student')
+
+
+@flask_app.route('/team/create', methods=['GET', 'POST'])
+@login_required
+def create_team():
+    if current_user.role != 'admin':
+        flash('You need to have admin role to create a team', 'warning')
+        return redirect(url_for('login'))
+
+    form = CreateTeamForm()
+    if form.validate_on_submit():
+        team = Team(id=form.id.data, teamName=form.teamName.data)
+        db.session.add(team)
+        db.session.commit()
+        flash(f'Team with name {team.teamName} was successfuly created', 'success')
+        return redirect(url_for('create_team'))
+    return render_template('create_team.html', title='Create Team', form=form, legend='Create Team')
+
+
+@flask_app.route('/add_user', methods=['GET', 'POST'])
+@login_required
+def add_user():
+    if current_user.role != 'admin':
+        flash('You need to have admin role to create a team', 'warning')
+        return redirect(url_for('login'))
+
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        user = User(username=form.username.data, email=form.email.data, fullname=form.fullname.data, password=hashed_password, role=form.role.data, teamId=form.teamId.data)
+        db.session.add(user)
+        team = Team.query.filter_by(id=user.teamId).first()
+        if team is None:
+            newTeam = Team(id=user.teamId,
+                           teamName=form.teamName.data)
+            db.session.add(newTeam)
+            db.session.commit()
+            flash('Registered with a new team created', 'success')
+            return redirect(url_for('add_user'))
+        else:
+            db.session.commit()
+            flash('Registered to an existing team', 'success')
+            return redirect(url_for('add_user'))
+
+    return render_template('register.html', title='Add User', form=form, legend='Add User')

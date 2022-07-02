@@ -1,0 +1,26 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Login
+{% endblock %}
+{% block content %}
+    <h1>{{legend}}</h1>
+    <form action="" method="post">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.id.label }}<br>
+            {{ form.id }}<br>
+            {% for error in form.id.errors %}
+            <span class="danger">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.teamName.label }}<br>
+            {{ form.teamName(size=32) }}<br>
+            {% for error in form.teamName.errors %}
+            <span class="danger">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+{% endblock %}
