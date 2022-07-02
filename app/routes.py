@@ -232,7 +232,7 @@ def all_meetings_by_date(booking_date=None, time=None, room_id=None):
         meetings = Meeting.query.filter_by(date=booking_date).filter_by(roomId=room_id).filter_by(startTime=time).order_by(Meeting.date).order_by(Meeting.startTime).paginate(page=page, per_page=8)
     else:
         meetings = Meeting.query.filter_by(date=booking_date).filter_by(roomId=room_id).filter_by(startTime=time).filter_by(bookerId=current_user.id).order_by(Meeting.date).order_by(Meeting.startTime).paginate(page=page, per_page=10)
-    return render_template('all_meetings.html', meetings=meetings, legend=f'All Meetings on {booking_date} ')
+    return render_template('all_meetings.html', meetings=meetings, legend=f'All Meetings on {booking_date} at {time} ')
 
 
 @flask_app.route('/meeting/<int:meeting_id>/update', methods=['GET', 'POST'])
