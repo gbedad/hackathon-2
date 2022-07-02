@@ -159,6 +159,24 @@ def book_meeting():
     capacity_reached = False
     form = BookmeetingForm()
     if form.validate_on_submit():
+        booker = current_user
+
+        team = Team.query.filter_by(id=current_user.teamId).first()
+        room = Room.query.filter_by(id=form.rooms.data).first()
+        endTime = form.startTime.data + form.duration.data
+        check_capacity = room.capacity
+        # Check room space availability
+        all_the_meetings = db.session.query(Meeting.roomId, Meeting.startTime,
+                                            db.func.sum(Meeting.students).label('sum_students')).filter_by(
+            date=form.date.data).group_by(Meeting.roomId, Meeting.startTime).all()
+        check_slot = Meeting.query.filter_by(date=form.date.data).filter_by(roomId=form.rooms.data).first()
+
+        for slot_booked in all_the_meetings:
+            if room.id == slot_booked[0]  and form.startTime.data == slot_booked[1] and slot_booked[2] >= room.capacity:
+                flash('Cannot exceed room capacity', 'warning')
+                return redirect(url_for('book_meeting'))
+
+
         # check time collision
         """check_slot = Meeting.query.filter_by(date=form.date.data).filter_by(roomId=form.rooms.data).first()
         print(check_slot)
@@ -170,12 +188,7 @@ def book_meeting():
                     'warning')
                 return redirect(url_for('book_meeting'))"""
 
-        booker = current_user
 
-        team = Team.query.filter_by(id=current_user.teamId).first()
-        room = Room.query.filter_by(id=form.rooms.data).first()
-        endTime = form.startTime.data + form.duration.data
-        check_capacity = room.capacity
 
         print(form.students.data, check_capacity)
 
