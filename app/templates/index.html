@@ -5,6 +5,10 @@
 {% if current_user.is_anonymous %}
 <h3>Login to start booking process!</h3>
 {% else %}
-<h1>Hi, {{ current_user.username }}!</h1>
+<h3>You are currently logged as {{ current_user.username }}!</h3>
+
 {% endif %}
+
+<img src="{{url_for('static', filename='/img/app-gfa3957816_1280.png')}}" width="800px">
+
 {% endblock %}

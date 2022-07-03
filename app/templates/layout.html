@@ -64,15 +64,14 @@
 
 
     {% if current_user.role == 'admin' %}
-    <div class="admin-menu">
-    <a  class="list-group-item list-group-item-action nav-link"  href="{{ url_for('show_rooms') }}">View all Rooms</a >
-    <a  class="list-group-item list-group-item-action nav-link"  href="{{ url_for('create_room') }}">Create Room</a >
-    <a  class="list-group-item list-group-item-action nav-link"  href="{{ url_for('create_team') }}">Create Team</a >
-    <a  class="list-group-item list-group-item-action nav-link"  href="{{ url_for('add_user') }}">Add User</a >
-    <a class="list-group-item list-group-item-action nav-link"   href="{{ url_for('delete_user') }}">Delete User</a >
-    <a  class="list-group-item list-group-item-action nav-link"  href="{{ url_for('add_student') }}">Create Student</a >
+
+    <a  class="list-group-item list-group-item-action nav-link admin-menu"  href="{{ url_for('show_rooms') }}">View all Rooms</a >
+    <a  class="list-group-item list-group-item-action nav-link admin-menu"  href="{{ url_for('create_room') }}">Create Room</a >
+    <a  class="list-group-item list-group-item-action nav-link admin-menu"  href="{{ url_for('create_team') }}">Create Team</a >
+    <a  class="list-group-item list-group-item-action nav-link admin-menu"  href="{{ url_for('add_user') }}">Add User</a >
+    <a class="list-group-item list-group-item-action nav-link admin-menu"   href="{{ url_for('delete_user') }}">Delete User</a >
+    <a  class="list-group-item list-group-item-action nav-link admin-menu"  href="{{ url_for('add_student') }}">Create Student</a >
     {% endif %}
-    </div>
 {% endif %}
 </div>
 
