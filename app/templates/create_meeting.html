@@ -5,7 +5,7 @@ Booking
 {% endblock %}
 
 {% block content %}
-<legend class="border-bottom mb-4 text-warning">{{legend}}</legend>
+<legend class="border-bottom mb-4 text-info">{{legend}}</legend>
 {% from "_formhelpers.html" import render_field %}
     <form action="" method="post">
         {{ form.hidden_tag() }}
@@ -48,6 +48,6 @@ Booking
             {% endfor %}
 
 
-        <p>{{ form.submit() }}</p>
+        <p>{{ form.submit() }}</button>
     </form>
 {% endblock %}
