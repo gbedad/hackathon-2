@@ -28,7 +28,7 @@ def login():
             login_user(user, remember=form.remember_me.data)
             next_page = request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for('account'))
-        else:
+        else: # please remove redundant else
             flash('Login Unsuccessful, please check username and password', 'danger')
     return render_template('login.html', title='Login', form=form)
 
@@ -46,14 +46,14 @@ def register():
                     fullname=form.fullname.data, role=form.role.data, teamId=form.teamId.data)
         db.session.add(user)
         team = Team.query.filter_by(id=user.teamId).first()
-        if team is None:
+        if team is None: # if not team
             newTeam = Team(id=user.teamId,
                            teamName=form.teamName.data)
             db.session.add(newTeam)
             db.session.commit()
             flash('Registered with a new team created', 'success')
             return redirect(url_for('login'))
-        else:
+        else: # remove redundant else
             db.session.commit()
             flash('Registered to an existing team', 'success')
             return redirect(url_for('login'))
@@ -89,14 +89,14 @@ def delete_user():
 
         meetings = Meeting.query.filter_by(bookerId=user.id).all()
         hasFutureBooking = False
-        for meeting in meetings:
+        for meeting in meetings: # please export to function 
             if meeting.date > datetime.datetime.now():
                 hasFutureBooking = True
                 break
         if hasFutureBooking:
             flash('You cannot delete a user that holds future bookings!', 'warning')
             return redirect(url_for('delete_user'))
-        elif user.id == current_user.id:
+        elif user.id == current_user.id: # please change to if
             flash('You cannot delete yourself!', 'danger')
             return redirect(url_for('delete_user'))
 
@@ -120,7 +120,7 @@ def create_room():
             db.session.commit()
             flash('Room created', 'success')
             return redirect(url_for('show_rooms'))
-        else:
+        else: # remove else
             flash('Room already existing', 'danger')
     return render_template('create_room.html', title='Create Room', form=form, legend='Create room')
 
@@ -262,7 +262,7 @@ def meeting_update(meeting_id):
         meeting.duration = form.duration.data
         meeting.students = form.students.data
         meeting.is_confirmed = form.is_confirmed.data
-        if check_capacity < meeting.students - 1:
+        if check_capacity < meeting.students - 1: # you can export to a file called meetings and have a function is_full
             flash('You cannot exceed the room capacity', 'warning')
             return redirect(
                 url_for('meeting_update', meeting_id=meeting.id)
@@ -316,7 +316,7 @@ def occupied_rooms():
         #print(all_the_meetings)
         for my_meeting in all_the_meetings:
             print(my_meeting[1])
-        for room in rooms:
+        for room in rooms: # please export to fucntions
             room_occupied = dict()
             room_occupied['roomId'] = room.id
             room_occupied['roomName'] = room.roomName
@@ -403,7 +403,7 @@ def add_user():
         user = User(username=form.username.data, email=form.email.data, fullname=form.fullname.data, password=hashed_password, role=form.role.data, teamId=form.teamId.data)
         db.session.add(user)
         team = Team.query.filter_by(id=user.teamId).first()
-        if team is None:
+        if team is None: # change to if not ream
             newTeam = Team(id=user.teamId,
                            teamName=form.teamName.data)
             db.session.add(newTeam)
